@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "node-addon-api": "*"
+  },
+  "scripts": {
+    "test": "node sample/sample1.js"
+  },
+  "gypfile": true,
+  "name": "griddb-node-api",
+  "version": "0.8.0",
+  "description": "Node API for GridDB",
+  "author": "TOSHIBA Digital Solutions Corporation",
+  "license": "Apache-2.0"
+}
