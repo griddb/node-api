@@ -52,8 +52,13 @@ StoreFactory::StoreFactory(const Napi::CallbackInfo &info) :
 static bool checkMulticast(const char* address) {
     if (address && address[0] != '\0') {
         const char* tmp = reinterpret_cast<const char*>(Util::strdup(address));
+        char *octets;
+#if defined __USE_POSIX || defined __USE_MISC
         char *savePtr;
-        char *octets = strtok_r(const_cast<char*>(tmp), ".", &savePtr);
+        octets = strtok_r(const_cast<char*>(tmp), ".", &savePtr);
+#else
+        octets = strtok(const_cast<char*>(tmp), ".");
+#endif
         if (octets) {
             int firstOctet = atoi(octets);
             int first4Bits = firstOctet >> 4 & 0x0f;

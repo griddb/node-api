@@ -296,9 +296,9 @@ static void toFieldAsString(const Napi::Env &env, Napi::Value *value,
         THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
         return;
     }
-    const char *stringVal;
-    stringVal = value->As<Napi::String>().Utf8Value().c_str();
-    GSResult ret = gsSetRowFieldByString(row, column, stringVal);
+    std::string stringVal;
+    stringVal = value->As<Napi::String>().Utf8Value();
+    GSResult ret = gsSetRowFieldByString(row, column, stringVal.c_str());
     ENSURE_SUCCESS_CPP(Util::toFieldAsString, ret)
 }
 

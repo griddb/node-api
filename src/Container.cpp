@@ -119,7 +119,7 @@ Container::Container(const Napi::CallbackInfo &info) :
         }
 
         mTypeList = new GSType[mContainerInfo->columnCount]();
-    } catch (std::bad_alloc& ba) {
+    } catch (std::bad_alloc&) {
         // Memory allocation error
         freeMemoryContainer(&mContainerInfo, &mTypeList);
         THROW_EXCEPTION_WITH_STR(env, "Memory allocation error", mContainer)
@@ -226,6 +226,7 @@ Napi::Value Container::get(const Napi::CallbackInfo &info) {
     int64_t tmpLongValue;
     std::string tmpString;
     GSTimestamp tmpTimestampValue;
+    const GSChar* rowkeyPtr;
 
     switch (type) {
     case GS_TYPE_STRING: {
@@ -236,7 +237,8 @@ Napi::Value Container::get(const Napi::CallbackInfo &info) {
         }
 
         tmpString = fieldValue.ToString().Utf8Value();
-        key = reinterpret_cast<void*>(&tmpString);
+        rowkeyPtr = tmpString.c_str();
+        key = &rowkeyPtr;
         break;
     }
     case GS_TYPE_INTEGER: {
@@ -343,7 +345,7 @@ Napi::Value Container::multiPut(const Napi::CallbackInfo &info) {
 
     try {
         listRowdata = new GSRow*[rowCount]();
-    } catch (std::bad_alloc &ba) {
+    } catch (std::bad_alloc&) {
         PROMISE_REJECT_WITH_STRING(
                 deferred, env, "Memory allocation error", mContainer)
     }
@@ -550,10 +552,14 @@ Napi::Value Container::remove(const Napi::CallbackInfo &info) {
         ret = gsDeleteRow(mContainer, NULL, &exists);
     } else {
         switch (type) {
-        case GS_TYPE_STRING:
+        case GS_TYPE_STRING: {
+            GSChar* rowkeyPtr = const_cast<GSChar*> (fieldValue.
+                                ToString().Utf8Value().c_str());
+            const void * key = reinterpret_cast<void*>(&rowkeyPtr);
             ret = gsDeleteRow(mContainer,
-                    fieldValue.ToString().Utf8Value().c_str(), &exists);
+                    key, &exists);
             break;
+            }
         case GS_TYPE_INTEGER: {
             int tmpIntValue = fieldValue.ToNumber().Int32Value();
             ret = gsDeleteRow(mContainer, &tmpIntValue, &exists);

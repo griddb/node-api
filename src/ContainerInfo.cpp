@@ -80,7 +80,7 @@ ContainerInfo::ContainerInfo(const Napi::CallbackInfo &info) :
             } else {
                 mContainerInfo.dataAffinity = NULL;
             }
-        } catch (std::bad_alloc &ba) {
+        } catch (std::bad_alloc&) {
             // Case allocation memory error
             if (gsProps) {
                 delete gsProps;
@@ -279,7 +279,7 @@ void ContainerInfo::init(const Napi::Env &env, const GSChar *name,
         if (name != NULL) {
             containerName = Util::strdup(name);
         }
-    } catch (std::bad_alloc &ba) {
+    } catch (std::bad_alloc&) {
         if (columnInfoList) {
             for (int i = 0; i < propsCount; i++) {
                 if (columnInfoList[i].name) {
@@ -440,7 +440,7 @@ void ContainerInfo::setColumnInfoList(const Napi::CallbackInfo &info,
 
     try {
         containerInfo = new GSColumnInfo[len]();
-    } catch (std::bad_alloc &ba) {
+    } catch (std::bad_alloc&) {
         THROW_EXCEPTION_WITH_STR(env, "Memory allocation error", NULL)
         return;
     }
@@ -524,7 +524,7 @@ void ContainerInfo::setColumnInfoList(const Napi::CallbackInfo &info,
     GSColumnInfo *tmpColumnInfoList = NULL;
     try {
         tmpColumnInfoList = new GSColumnInfo[columnInfoList.size]();
-    } catch (std::bad_alloc &ba) {
+    } catch (std::bad_alloc&) {
         THROW_EXCEPTION_WITH_STR(env, "Memory allocation error", NULL)
         return;
     }
@@ -538,7 +538,7 @@ void ContainerInfo::setColumnInfoList(const Napi::CallbackInfo &info,
             try {
                 tmpColumnInfoList[i].name = Util::strdup(
                         columnInfoList.columnInfo[i].name);
-            } catch (std::bad_alloc &ba) {
+            } catch (std::bad_alloc&) {
                 delete[] tmpColumnInfoList;
                 tmpColumnInfoList = NULL;
                 THROW_EXCEPTION_WITH_STR(env, "Memory allocation error", NULL)
@@ -607,7 +607,7 @@ void ContainerInfo::setExpiration(const Napi::CallbackInfo &info,
         GSTimeSeriesProperties* ts;
         try {
             ts = new GSTimeSeriesProperties();
-        } catch (std::bad_alloc& ba) {
+        } catch (std::bad_alloc&) {
             THROW_EXCEPTION_WITH_STR(
                     info.Env(), "Memory allocation error", NULL)
             return;

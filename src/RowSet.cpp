@@ -56,7 +56,7 @@ RowSet::RowSet(const Napi::CallbackInfo& info) :
 
     try {
         typeList = new GSType[mContainerInfo->columnCount]();
-    } catch (std::bad_alloc& ba) {
+    } catch (std::bad_alloc&) {
         THROW_EXCEPTION_WITH_STR(env, "Memory allocation error", mRowSet)
         return;
     }
