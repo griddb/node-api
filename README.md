@@ -8,28 +8,58 @@ GridDB Node API is developed using GridDB C Client and [node-addon-api](https://
 
 Building of the library and execution of the sample programs have been checked in the following environment.
 
-    OS: CentOS 7(x64)/Ubuntu 18.04(x64)
+    OS: CentOS 7(x64)/Ubuntu 18.04(x64)/Windows 10/MacOS 10.15
     Node.js: v12
     GridDB C client: V4.5 CE
     GridDB server: V4.5 CE, CentOS 7.6(x64)
 
-## QuickStart (CentOS 7/Ubuntu 18.04(x64))
-
-### Preparations
+## Preparations
 
 Install [GridDB Server](https://github.com/griddb/griddb) and [C Client](https://github.com/griddb/c_client). 
 
-Set LIBRARY_PATH. 
-
-    export LIBRARY_PATH=$LIBRARY_PATH:<C client library file directory path>
+## QuickStart (CentOS 7/Ubuntu 18.04(x64)/MacOS 10.15)
 
 ### Build
-    1. The command to run build project
-    $ npm install
+    1. Set LIBRARY_PATH.
 
-    2. Set the NODE_PATH variable for griddb Node.js module files.
+        export LIBRARY_PATH=$LIBRARY_PATH:<C client library file directory path>
 
-    $ export NODE_PATH=<installed directory path>
+    2. The command to run build project
+
+        $ npm install
+
+    3. Set the NODE_PATH variable for griddb Node.js module files.
+
+        $ export NODE_PATH=<installed directory path>
+
+    4. Write require("griddb-node-api") in Node.js.
+
+### How to run sample
+
+GridDB Server need to be started in advance.
+
+    1. Set LD_LIBRARY_PATH.
+
+        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:<C client library file directory path>
+
+    2. The command to run sample
+
+        $ node sample/sample1.js <GridDB notification address> <GridDB notification port>
+            <GridDB cluster name> <GridDB user> <GridDB password>
+          -->[ 'name01', false, 1, <Buffer 41 42 43 44 45 46 47 48 49 4a> ]
+
+## QuickStart (Windows 10)
+
+### Build and run in cmd
+    1. Correct the path to C Client "C_CLIENT_PATH" in binding.gyp. Default is 'C:/Program Files/GridDB/C Client/4.5.0'
+
+    2. The command to run build project
+
+        $ npm install
+
+    3. Set the NODE_PATH variable for griddb Node.js module files.
+
+        $ set NODE_PATH=<installed directory path>
 
     3. Write require("griddb-node-api") in Node.js.
 
@@ -37,11 +67,7 @@ Set LIBRARY_PATH.
 
 GridDB Server need to be started in advance.
 
-    1. Set LD_LIBRARY_PATH
-
-        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:<C client library file directory path>
-
-    2. The command to run sample
+    1. The command to run sample
 
         $ node sample/sample1.js <GridDB notification address> <GridDB notification port>
             <GridDB cluster name> <GridDB user> <GridDB password>
