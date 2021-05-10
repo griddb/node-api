@@ -8,8 +8,8 @@ GridDB Node API is developed using GridDB C Client and [node-addon-api](https://
 
 Building of the library and execution of the sample programs have been checked in the following environment.
 
-    OS: CentOS 7(x64)/Ubuntu 18.04(x64)/Windows 10/MacOS 10.15
-    Node.js: v12
+    OS: CentOS 7.9(x64)/Ubuntu 20.04(x64)/Windows 10/MacOS 10.15
+    Node.js: v14/v16
     GridDB C client: V4.5 CE
     GridDB server: V4.5 CE, CentOS 7.6(x64)
 
@@ -17,7 +17,7 @@ Building of the library and execution of the sample programs have been checked i
 
 Install [GridDB Server](https://github.com/griddb/griddb) and [C Client](https://github.com/griddb/c_client). 
 
-## QuickStart (CentOS 7/Ubuntu 18.04(x64)/MacOS 10.15)
+## QuickStart (CentOS 7/Ubuntu 20.04(x64)/MacOS 10.15)
 
 ### Build
     1. Set LIBRARY_PATH.
