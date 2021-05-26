@@ -28,6 +28,8 @@ Napi::Object Container::init(Napi::Env env, Napi::Object exports) {
             {   InstanceMethod("put", &Container::put),
                 InstanceMethod("query", &Container::query),
                 InstanceMethod("get", &Container::get),
+                InstanceMethod("queryByTimeSeriesRange",
+                    &Container::queryByTimeSeriesRange),
                 InstanceMethod("multiPut", &Container::multiPut),
                 InstanceMethod("createIndex", &Container::createIndex),
                 InstanceMethod("dropIndex", &Container::dropIndex),
@@ -295,6 +297,38 @@ Napi::Value Container::get(const Napi::CallbackInfo &info) {
     }
     deferred.Resolve(outputWrapper);
     return deferred.Promise();
+}
+
+Napi::Value Container::queryByTimeSeriesRange(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    if (info.Length() != 2) {
+        // Throw error
+        THROW_EXCEPTION_WITH_STR(env, "Wrong arguments", mContainer)
+    }
+    Field field;
+    Napi::Value startValue = info[0].As<Napi::Value>();
+    Napi::Value endValue = info[1].As<Napi::Value>();
+
+    GSResult ret;
+    GSQuery* pQuery = NULL;
+    GSTimestamp startTimestampValue = Util::toGsTimestamp(env, &startValue);
+    GSTimestamp endTimestampValue = Util::toGsTimestamp(env, &endValue);
+
+    ret = gsQueryByTimeSeriesRange(mContainer, startTimestampValue,
+        endTimestampValue, &pQuery);
+    if (!GS_SUCCEEDED(ret)) {
+        THROW_EXCEPTION_WITH_CODE(env, ret, mContainer)
+    }
+
+    // Create new Store object
+    Napi::EscapableHandleScope scope(env);
+    auto queryPtr = Napi::External<GSQuery>::New(env, pQuery);
+    auto containerInfoPtr = Napi::External<GSContainerInfo>::New(env,
+            mContainerInfo);
+    auto gsRowPtr = Napi::External<GSRow>::New(env, mRow);
+
+    return scope.Escape(Query::constructor.New( { queryPtr, containerInfoPtr,
+            gsRowPtr })).ToObject();
 }
 
 Container::~Container() {

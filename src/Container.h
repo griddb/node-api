@@ -41,6 +41,7 @@ class Container: public Napi::ObjectWrap<Container> {
     Napi::Value put(const Napi::CallbackInfo &info);
     Napi::Value query(const Napi::CallbackInfo &info);
     Napi::Value get(const Napi::CallbackInfo &info);
+    Napi::Value queryByTimeSeriesRange(const Napi::CallbackInfo &info);
     Napi::Value multiPut(const Napi::CallbackInfo &info);
     Napi::Value createIndex(const Napi::CallbackInfo &info);
     Napi::Value dropIndex(const Napi::CallbackInfo &info);
