@@ -194,7 +194,7 @@ Napi::Value Container::query(const Napi::CallbackInfo &info) {
         return env.Null();
     }
 
-    // Create new Store object
+    // Create new objects
     Napi::EscapableHandleScope scope(env);
     auto queryPtr = Napi::External<GSQuery>::New(env, pQuery);
     auto containerInfoPtr = Napi::External<GSContainerInfo>::New(env,
@@ -304,6 +304,7 @@ Napi::Value Container::queryByTimeSeriesRange(const Napi::CallbackInfo &info) {
     if (info.Length() != 2) {
         // Throw error
         THROW_EXCEPTION_WITH_STR(env, "Wrong arguments", mContainer)
+    	return env.Null();
     }
     Field field;
     Napi::Value startValue = info[0].As<Napi::Value>();
@@ -318,9 +319,10 @@ Napi::Value Container::queryByTimeSeriesRange(const Napi::CallbackInfo &info) {
         endTimestampValue, &pQuery);
     if (!GS_SUCCEEDED(ret)) {
         THROW_EXCEPTION_WITH_CODE(env, ret, mContainer)
+    	return env.Null();
     }
 
-    // Create new Store object
+    // Create new objects
     Napi::EscapableHandleScope scope(env);
     auto queryPtr = Napi::External<GSQuery>::New(env, pQuery);
     auto containerInfoPtr = Napi::External<GSContainerInfo>::New(env,
