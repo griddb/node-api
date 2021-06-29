@@ -77,7 +77,7 @@ Napi::Value RowSet::next(const Napi::CallbackInfo &info) {
     GSRowSetType type = mType;
     bool hasNextRow;
     GSAggregationResult *aggResult = NULL;
-
+    GSQueryAnalysisEntry *queryResult = NULL;
     switch (type) {
     case (GS_ROW_SET_CONTAINER_ROWS):
         this->nextRow(env, &hasNextRow);
@@ -86,8 +86,17 @@ Napi::Value RowSet::next(const Napi::CallbackInfo &info) {
         hasNextRow = this->hasNext();
         aggResult = this->getNextAggregation(env);
         break;
+    case (GS_ROW_SET_QUERY_ANALYSIS): {
+        GSQueryAnalysisEntry gsQueryAnalysis =
+                GS_QUERY_ANALYSIS_ENTRY_INITIALIZER;
+        queryResult = &gsQueryAnalysis;
+        this->getNextQueryAnalysis(env, &queryResult);
+        hasNextRow = true;
+        break;
+    }
     default:
-        THROW_EXCEPTION_WITH_STR(env, "type for rowset is not correct", mRowSet)
+        THROW_EXCEPTION_WITH_STR(env, "type for rowset is not correct",
+                mRowSet)
         return env.Null();
     }
 
@@ -110,6 +119,15 @@ Napi::Value RowSet::next(const Napi::CallbackInfo &info) {
                 AggregationResult::constructor.New({aggPtr})).ToObject();
         break;
     }
+    case GS_ROW_SET_QUERY_ANALYSIS: {
+        Napi::EscapableHandleScope scope(env);
+        auto queryPtr = Napi::External<GSQueryAnalysisEntry>::New(env,
+                queryResult);
+        returnWrapper = scope.Escape(
+                QueryAnalysisEntry::constructor.New({queryPtr})).ToObject();
+        break;
+    }
+
     default:
         THROW_EXCEPTION_WITH_STR(env, "Type is not support", mRowSet)
         return env.Null();
@@ -201,6 +219,15 @@ GSAggregationResult* RowSet::getNextAggregation(Napi::Env env) {
     }
 
     return pAggResult;
+}
+
+void RowSet::getNextQueryAnalysis(Napi::Env env,
+        GSQueryAnalysisEntry **queryResult) {
+    GSResult ret = gsGetNextQueryAnalysis(mRowSet, *queryResult);
+    if (!GS_SUCCEEDED(ret)) {
+        THROW_EXCEPTION_WITH_CODE(env, ret, mRowSet)
+        return;
+    }
 }
 
 }  // namespace griddb

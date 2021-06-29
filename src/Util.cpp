@@ -65,7 +65,7 @@ static Napi::Value fromFieldAsLong(const Napi::Env& env, GSRow* row,
         int column) {
     int64_t longValue;
     GSResult ret = gsGetRowFieldAsLong(row, (int32_t) column, &longValue);
-    ENSURE_SUCCESS(Util::fromFieldAsLong, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsLong, ret)
     if (longValue) {
         return Napi::Number::New(env, longValue);
     } else if (isNull(row, column)) {
@@ -81,7 +81,7 @@ static Napi::Value fromFieldAsString(const Napi::Env& env, GSRow* row,
     GSChar *stringValue;
     GSResult ret = gsGetRowFieldAsString(row, (int32_t) column,
             (const GSChar**) &stringValue);
-    ENSURE_SUCCESS(Util::fromFieldAsString, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsString, ret)
     if ((stringValue != NULL) && (stringValue[0] == '\0')) {
         // Empty string
         if (isNull(row, column)) {
@@ -99,7 +99,7 @@ static Napi::Value fromFieldAsBlob(const Napi::Env& env, GSRow* row,
        int column) {
     GSBlob blobValue;
     GSResult ret = gsGetRowFieldAsBlob(row, (int32_t) column, &blobValue);
-    ENSURE_SUCCESS(Util::fromFieldAsBlob, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsBlob, ret)
     const GSChar* string;
     if (blobValue.size) {
         string = Util::strdup((const GSChar *) blobValue.data);
@@ -119,7 +119,7 @@ static Napi::Value fromFieldAsBool(const Napi::Env& env, GSRow* row,
         int column) {
     GSBool boolValue;
     GSResult ret = gsGetRowFieldAsBool(row, (int32_t) column, &boolValue);
-    ENSURE_SUCCESS(Util::fromFieldAsBool, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsBool, ret)
     if (boolValue) {
         return Napi::Boolean::New(env, static_cast<bool>(boolValue));
     } else if (isNull(row, column)) {
@@ -134,7 +134,7 @@ static Napi::Value fromFieldAsInteger(const Napi::Env& env, GSRow* row,
         int column) {
     int32_t intValue;
     GSResult ret = gsGetRowFieldAsInteger(row, (int32_t) column, &intValue);
-    ENSURE_SUCCESS(Util::fromFieldAsInteger, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsInteger, ret)
     if (intValue) {
         return Napi::Number::New(env, intValue);
     } else if (isNull(row, column)) {
@@ -149,7 +149,7 @@ static Napi::Value fromFieldAsFloat(const Napi::Env& env, GSRow* row,
         int column) {
     float floatValue;
     GSResult ret = gsGetRowFieldAsFloat(row, (int32_t) column, &floatValue);
-    ENSURE_SUCCESS(Util::fromFieldAsFloat, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsFloat, ret)
     if (floatValue) {
         return Napi::Number::New(env, floatValue);
     } else if (isNull(row, column)) {
@@ -164,7 +164,7 @@ static Napi::Value fromFieldAsDouble(const Napi::Env& env, GSRow* row,
         int column) {
     double doubleValue;
     GSResult ret = gsGetRowFieldAsDouble(row, (int32_t) column, &doubleValue);
-    ENSURE_SUCCESS(Util::fromFieldAsDouble, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsDouble, ret)
     if (doubleValue) {
         return Napi::Number::New(env, doubleValue);
     } else if (isNull(row, column)) {
@@ -180,7 +180,7 @@ static Napi::Value fromFieldAsTimestamp(const Napi::Env &env, GSRow *row,
     GSTimestamp timestampValue;
     GSResult ret = gsGetRowFieldAsTimestamp(row, (int32_t) column,
             &timestampValue);
-    ENSURE_SUCCESS(Util::fromFieldAsTimestamp, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsTimestamp, ret)
     if (timestampValue) {
         return Util::fromTimestamp(env, &timestampValue);
     } else if (isNull(row, column)) {
@@ -195,7 +195,7 @@ static Napi::Value fromFieldAsByte(const Napi::Env& env, GSRow* row,
         int column) {
     int8_t byteValue;
     GSResult ret = gsGetRowFieldAsByte(row, (int32_t) column, &byteValue);
-    ENSURE_SUCCESS(Util::fromFieldAsInteger, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsInteger, ret)
     if (byteValue) {
         return Napi::Number::New(env, byteValue);
     } else if (isNull(row, column)) {
@@ -210,7 +210,7 @@ static Napi::Value fromFieldAsShort(const Napi::Env& env, GSRow* row,
         int column) {
     int16_t shortValue;
     GSResult ret = gsGetRowFieldAsShort(row, (int32_t) column, &shortValue);
-    ENSURE_SUCCESS(Util::fromFieldAsShort, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsShort, ret)
     if (shortValue) {
         return Napi::Number::New(env, shortValue);
     } else if (isNull(row, column)) {
@@ -226,7 +226,7 @@ static Napi::Value fromFieldAsGeometry(const Napi::Env& env, GSRow* row,
     GSChar *geoValue;
     GSResult ret = gsGetRowFieldAsGeometry(row, (int32_t) column,
             (const GSChar**) &geoValue);
-    ENSURE_SUCCESS(Util::fromFieldAsGeometry, ret, NULL)
+    ENSURE_SUCCESS_CPP(Util::fromFieldAsGeometry, ret)
     if ((geoValue != NULL) && (geoValue[0] == '\0')) {
         // Empty string
         if (isNull(row, column)) {
@@ -293,7 +293,7 @@ Napi::Value Util::fromTimestamp(const Napi::Env& env, GSTimestamp *timestamp) {
 static void toFieldAsString(const Napi::Env &env, Napi::Value *value,
         GSRow *row, int column) {
     if (!value->IsString()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be string")
         return;
     }
     std::string stringVal;
@@ -305,7 +305,8 @@ static void toFieldAsString(const Napi::Env &env, Napi::Value *value,
 static void toFieldAsLong(const Napi::Env &env, Napi::Value *value, GSRow *row,
             int column) {
     if (!value->IsNumber()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be long")
+        return;
     }
 
     // input can be integer
@@ -313,7 +314,8 @@ static void toFieldAsLong(const Napi::Env &env, Napi::Value *value, GSRow *row,
     // When input value is integer,
     // it should be between -9007199254740992(-2^53)/9007199254740992(2^53).
     if (!(MIN_LONG <= longVal && MAX_LONG >= longVal)) {
-        THROW_EXCEPTION_WITH_STR(env, "Input error", NULL)
+        THROW_EXCEPTION_WITH_STR(env,
+            "Input error, should be in range of long", NULL)
         return;
     }
 
@@ -324,10 +326,11 @@ static void toFieldAsLong(const Napi::Env &env, Napi::Value *value, GSRow *row,
 static void toFieldAsBool(const Napi::Env &env, Napi::Value *value, GSRow *row,
         int column) {
     bool boolVal;
-    if (value->IsBoolean()) {
-        boolVal = value->As<Napi::Boolean>().Value();
-    } else {
+    if (value->IsBoolean() || value->IsNumber()) {
         boolVal = value->ToBoolean().Value();
+    } else {
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be bool")
+        return;
     }
 
     GSResult ret = gsSetRowFieldByBool(row, column, boolVal);
@@ -337,13 +340,14 @@ static void toFieldAsBool(const Napi::Env &env, Napi::Value *value, GSRow *row,
 static void toFieldAsByte(const Napi::Env &env, Napi::Value *value, GSRow *row,
         int column) {
     if (!value->IsNumber()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be byte")
         return;
     }
     int tmpInt = value->As<Napi::Number>().Int32Value();
     if (tmpInt < std::numeric_limits < int8_t > ::min()
             || tmpInt > std::numeric_limits < int8_t > ::max()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env,
+            "Input error, should be in range of byte")
         return;
     }
     GSResult ret = gsSetRowFieldByByte(row, column, tmpInt);
@@ -353,13 +357,14 @@ static void toFieldAsByte(const Napi::Env &env, Napi::Value *value, GSRow *row,
 static void toFieldAsShort(const Napi::Env &env, Napi::Value *value, GSRow *row,
         int column) {
     if (!value->IsNumber()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be short")
         return;
     }
     int tmpInt = value->As<Napi::Number>().Int32Value();
     if (tmpInt < std::numeric_limits < int16_t > ::min()
             || tmpInt > std::numeric_limits < int16_t > ::max()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env,
+            "Input error, should be in range of short")
         return;
     }
     GSResult ret = gsSetRowFieldByShort(row, column, tmpInt);
@@ -369,7 +374,7 @@ static void toFieldAsShort(const Napi::Env &env, Napi::Value *value, GSRow *row,
 static void toFieldAsInteger(const Napi::Env &env, Napi::Value *value,
         GSRow *row, int column) {
     if (!value->IsNumber()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be integer")
         return;
     }
     int tmpInt = value->As<Napi::Number>().Int32Value();
@@ -377,10 +382,10 @@ static void toFieldAsInteger(const Napi::Env &env, Napi::Value *value,
     ENSURE_SUCCESS_CPP(Util::toFieldAsInteger, ret)
 }
 
-static void toFieldAsFloat(const Napi::Env &env, Napi::Value *value, GSRow *row,
-        int column) {
+static void toFieldAsFloat(const Napi::Env &env, Napi::Value *value,
+        GSRow *row, int column) {
     if (!value->IsNumber()) {
-        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error")
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be float")
         return;
     }
     float floatVal = value->As<Napi::Number>().FloatValue();
@@ -392,7 +397,8 @@ static void toFieldAsFloat(const Napi::Env &env, Napi::Value *value, GSRow *row,
 static void toFieldAsDouble(const Napi::Env &env, Napi::Value *value,
         GSRow *row, int column) {
     if (!value->IsNumber()) {
-        Napi::Object gsException = griddb::GSException::New(env, "Input error");
+        Napi::Object gsException = griddb::GSException::New(env,
+                "Input error, should be double");
         THROW_GSEXCEPTION(gsException)
         return;
     }
@@ -450,6 +456,12 @@ static void toFieldAsTimestamp(const Napi::Env &env, Napi::Value *value,
 static void toFieldAsBlob(const Napi::Env &env, Napi::Value *value, GSRow *row,
         int column) {
     GSBlob blobVal;
+    if (!value->IsBuffer()) {
+        Napi::Object gsException = griddb::GSException::New(env,
+                "Input error, should be buffer");
+        THROW_GSEXCEPTION(gsException)
+        return;
+    }
     Napi::Buffer<char> stringBuffer = value->As<Napi::Buffer<char>>();
     char *v = static_cast<char*>(stringBuffer.Data());
     size_t size = stringBuffer.Length();
@@ -459,8 +471,18 @@ static void toFieldAsBlob(const Napi::Env &env, Napi::Value *value, GSRow *row,
     ENSURE_SUCCESS_CPP(Util::toFieldAsBlob, ret)
 }
 
+static void toFieldAsNull(const Napi::Env &env, Napi::Value *value,
+        GSRow *row, int column) {
+    GSResult ret = gsSetRowFieldNull(row, column);
+    ENSURE_SUCCESS_CPP(Util::toFieldAsNull, ret)
+}
+
 void Util::toField(const Napi::Env &env, Napi::Value *value, GSRow *row,
         int column, GSType type) {
+    if (value->IsNull() || value->IsUndefined()) {
+        toFieldAsNull(env, value, row, column);
+        return;
+    }
     switch (type) {
     case GS_TYPE_STRING: {
         toFieldAsString(env, value, row, column);
@@ -506,9 +528,7 @@ void Util::toField(const Napi::Env &env, Napi::Value *value, GSRow *row,
         break;
     }
     default:
-        Napi::Object gsException = griddb::GSException::New(
-                env, "Output error.");
-        THROW_GSEXCEPTION(gsException)
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Type is not support")
         break;
     }
 }

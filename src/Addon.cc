@@ -27,6 +27,8 @@
 #include "Query.h"
 #include "RowSet.h"
 #include "Store.h"
+#include "RowKeyPredicate.h"
+#include "QueryAnalysisEntry.h"
 
 Napi::Object init(Napi::Env env, Napi::Object exports);
 
@@ -45,6 +47,8 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
     PartitionController::init(env, exports);
     Query::init(env, exports);
     RowSet::init(env, exports);
+    RowKeyPredicate::init(env, exports);
+    QueryAnalysisEntry::init(env, exports);
     return exports;
 }
 
