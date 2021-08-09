@@ -19,6 +19,7 @@
 
 #include <napi.h>
 #include "AggregationResult.h"
+#include "QueryAnalysisEntry.h"
 #include "Macro.h"
 
 namespace griddb {
@@ -40,6 +41,8 @@ class RowSet: public Napi::ObjectWrap<RowSet> {
     Napi::Value getType(const Napi::CallbackInfo &info);
     Napi::Value getSize(const Napi::CallbackInfo &info);
     GSAggregationResult* getNextAggregation(Napi::Env env);
+    void getNextQueryAnalysis(Napi::Env env,
+            GSQueryAnalysisEntry **queryResult);
 
  private:
     GSRowSet *mRowSet;

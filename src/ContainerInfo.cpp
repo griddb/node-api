@@ -304,7 +304,7 @@ void ContainerInfo::init(const Napi::Env &env, const GSChar *name,
 
     mContainerInfo.name = containerName;
     mContainerInfo.type = type;
-    mContainerInfo.columnCount = (size_t) propsCount;
+    mContainerInfo.columnCount = static_cast<size_t>(propsCount);
     mContainerInfo.columnInfoList = columnInfoList;
     mContainerInfo.rowKeyAssigned = rowKeyAssigned;
     if (timeProps != NULL) {
@@ -411,7 +411,7 @@ void ContainerInfo::setRowKeyAssigned(const Napi::CallbackInfo &info,
         const Napi::Value &value) {
     Napi::Env env = info.Env();
     int length = info.Length();
-    if (length <= 0 || !info[0].IsBoolean()) {
+    if (length != 1 || !info[0].IsBoolean()) {
         THROW_EXCEPTION_WITH_STR(env, "Boolean expected", NULL)
         return;
     }
@@ -430,7 +430,7 @@ void ContainerInfo::setColumnInfoList(const Napi::CallbackInfo &info,
     }
 
     Napi::Array arr = value.As<Napi::Array>();
-    size_t len = (size_t) arr.Length();
+    size_t len = static_cast<size_t>(arr.Length());
     if (len == 0) {
         THROW_EXCEPTION_WITH_STR(env, "Expected not empty array as input", NULL)
         return;

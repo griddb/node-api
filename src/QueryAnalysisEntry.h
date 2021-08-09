@@ -14,36 +14,35 @@
     limitations under the License.
 */
 
-#ifndef QUERY_H
-#define QUERY_H
+#ifndef QUERYANALYSISENTRY_H
+#define QUERYANALYSISENTRY_H
 
 #include <napi.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "gridstore.h"
 #include "Util.h"
-#include "RowSet.h"
-#include "Macro.h"
 
 namespace griddb {
 
-class Query: public Napi::ObjectWrap<Query> {
+class QueryAnalysisEntry: public Napi::ObjectWrap<QueryAnalysisEntry> {
  public:
     // Constructor static variable
     static Napi::FunctionReference constructor;
     static Napi::Object init(Napi::Env env, Napi::Object exports);
 
-    explicit Query(const Napi::CallbackInfo &info);
-    ~Query();
+    explicit QueryAnalysisEntry(const Napi::CallbackInfo &info);
+    ~QueryAnalysisEntry();
 
     // N-API methods
-    Napi::Value fetch(const Napi::CallbackInfo &info);
-    void setFetchOptions(const Napi::CallbackInfo &info);
-    Napi::Value getRowSet(const Napi::CallbackInfo &info);
-    GSQuery* gsPtr();
+    Napi::Value get(const Napi::CallbackInfo &info);
+
  private:
-    GSQuery *mQuery;
-    GSContainerInfo *mContainerInfo;
-    GSRow* mRow;
+    GSQueryAnalysisEntry mQueryAnalysis = GS_QUERY_ANALYSIS_ENTRY_INITIALIZER;
 };
 
 }  // namespace griddb
 
-#endif  // QUERY_H
+#endif  // QUERYANALYSISENTRY_H
+

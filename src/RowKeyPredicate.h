@@ -14,36 +14,36 @@
     limitations under the License.
 */
 
-#ifndef QUERY_H
-#define QUERY_H
+#ifndef ROWKEYPREDICATE_H
+#define ROWKEYPREDICATE_H
 
 #include <napi.h>
+#include "Field.h"
 #include "Util.h"
-#include "RowSet.h"
-#include "Macro.h"
+#include "gridstore.h"
 
 namespace griddb {
 
-class Query: public Napi::ObjectWrap<Query> {
+class RowKeyPredicate: public Napi::ObjectWrap<RowKeyPredicate> {
  public:
+    GSRowKeyPredicate *predicate;
+    GSType type;
+
     // Constructor static variable
     static Napi::FunctionReference constructor;
     static Napi::Object init(Napi::Env env, Napi::Object exports);
-
-    explicit Query(const Napi::CallbackInfo &info);
-    ~Query();
+    explicit RowKeyPredicate(const Napi::CallbackInfo &info);
+    ~RowKeyPredicate();
 
     // N-API methods
-    Napi::Value fetch(const Napi::CallbackInfo &info);
-    void setFetchOptions(const Napi::CallbackInfo &info);
-    Napi::Value getRowSet(const Napi::CallbackInfo &info);
-    GSQuery* gsPtr();
- private:
-    GSQuery *mQuery;
-    GSContainerInfo *mContainerInfo;
-    GSRow* mRow;
+    void setRange(const Napi::CallbackInfo &info);
+    void setDistinctKeys(const Napi::CallbackInfo &info);
+    Napi::Value getRange(const Napi::CallbackInfo &info);
+    Napi::Value getDistinctKeys(const Napi::CallbackInfo &info);
+    Napi::Value getKeyType(const Napi::CallbackInfo &info);
+    GSRowKeyPredicate* getPredicate();
 };
 
 }  // namespace griddb
 
-#endif  // QUERY_H
+#endif  // ROWKEYPREDICATE_H

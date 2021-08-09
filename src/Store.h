@@ -19,10 +19,10 @@
 
 #include <napi.h>
 #include <limits>
-#include "Store.h"
 #include "Container.h"
 #include "ContainerInfo.h"
 #include "PartitionController.h"
+#include "RowKeyPredicate.h"
 
 #include "Util.h"
 
@@ -43,6 +43,10 @@ class Store: public Napi::ObjectWrap<Store> {
     Napi::Value getContainer(const Napi::CallbackInfo &info);
     Napi::Value getContainerInfo(const Napi::CallbackInfo &info);
     Napi::Value getPartitionController(const Napi::CallbackInfo &info);
+    Napi::Value multiPut(const Napi::CallbackInfo &info);
+    Napi::Value multiGet(const Napi::CallbackInfo &info);
+    Napi::Value createRowKeyPredicate(const Napi::CallbackInfo &info);
+    Napi::Value fetchAll(const Napi::CallbackInfo &info);
 
     // N-API support methods
     void setReadonlyAttribute(const Napi::CallbackInfo &info,

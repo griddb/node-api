@@ -119,20 +119,25 @@ void Query::setFetchOptions(const Napi::CallbackInfo &info) {
 
 Napi::Value Query::getRowSet(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(env);
     GSRowSet *gsRowSet;
     GSResult ret = gsGetRowSet(mQuery, &gsRowSet);
 
     // Check ret, if error, throw exception
     if (!GS_SUCCEEDED(ret)) {
-        PROMISE_REJECT_WITH_ERROR_CODE(deferred, env, ret, mQuery)
+        THROW_EXCEPTION_WITH_CODE(env, ret, mQuery)
+        return env.Null();
     }
     auto rowset_ptr = Napi::External<GSRowSet>::New(env, gsRowSet);
+    auto containerInfo_ptr = Napi::External<GSContainerInfo>
+                ::New(env, mContainerInfo);
+    auto row_ptr = Napi::External<GSRow>::New(env, mRow);
     Napi::EscapableHandleScope scope(env);
-    Napi::Value rowset_wrapper = scope.Escape(RowSet::constructor.New({
-            rowset_ptr })).ToObject();
-    deferred.Resolve(rowset_wrapper);
-    return deferred.Promise();
+    return scope.Escape(RowSet::constructor.New({
+            rowset_ptr, containerInfo_ptr, row_ptr })).ToObject();
+}
+
+GSQuery* Query::gsPtr() {
+    return mQuery;
 }
 
 }  // namespace griddb
