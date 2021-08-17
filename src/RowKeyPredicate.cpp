@@ -273,8 +273,8 @@ void RowKeyPredicate::setDistinctKeys(const Napi::CallbackInfo &info) {
                 THROW_EXCEPTION_WITH_STR(env, "Wrong arguments", NULL)
                 return;
             }
-            const char *key = value.ToString().Utf8Value().c_str();
-            ret = gsAddPredicateKeyByString(predicate, key);
+            ret = gsAddPredicateKeyByString(predicate,
+                        value.ToString().Utf8Value().c_str());
             if (!GS_SUCCEEDED(ret)) {
                 THROW_EXCEPTION_WITH_CODE(env, ret, predicate)
                 return;

@@ -357,7 +357,7 @@ Napi::Value Store::multiPut(const Napi::CallbackInfo &info) {
             Napi::Value oneValue = arrOfContainer[k];
             Napi::Array arrayOneRow = oneValue.As<Napi::Array>();
             if (!oneValue.IsArray()) {
-                delete typeList;
+                delete []typeList;
                 PROMISE_REJECT_WITH_STRING(deferred, env,
                     "Expected an array as rowList", mStore)
             }
@@ -366,7 +366,7 @@ Napi::Value Store::multiPut(const Napi::CallbackInfo &info) {
                 try {
                     Util::toField(env, &oneVal, row, j, typeList[j]);
                 } catch (const Napi::Error &e) {
-                    delete typeList;
+                    delete []typeList;
                     freeMemoryDataMultiPut(listContainerName,
                             listRowContainerCount, entryList, allRowList,
                             containerCount);
@@ -375,7 +375,7 @@ Napi::Value Store::multiPut(const Napi::CallbackInfo &info) {
             }
             allRowList[i][k] = row;
         }
-        delete typeList;
+        delete []typeList;
         entryList[i].containerName = listContainerName[i];
         entryList[i].rowCount = listRowContainerCount[i];
         entryList[i].rowList = (void* const*)allRowList[i];

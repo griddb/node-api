@@ -78,6 +78,7 @@ Napi::Value RowSet::next(const Napi::CallbackInfo &info) {
     bool hasNextRow;
     GSAggregationResult *aggResult = NULL;
     GSQueryAnalysisEntry *queryResult = NULL;
+    GSQueryAnalysisEntry gsQueryAnalysis = GS_QUERY_ANALYSIS_ENTRY_INITIALIZER;
     switch (type) {
     case (GS_ROW_SET_CONTAINER_ROWS):
         this->nextRow(env, &hasNextRow);
@@ -87,8 +88,6 @@ Napi::Value RowSet::next(const Napi::CallbackInfo &info) {
         aggResult = this->getNextAggregation(env);
         break;
     case (GS_ROW_SET_QUERY_ANALYSIS): {
-        GSQueryAnalysisEntry gsQueryAnalysis =
-                GS_QUERY_ANALYSIS_ENTRY_INITIALIZER;
         queryResult = &gsQueryAnalysis;
         this->getNextQueryAnalysis(env, &queryResult);
         hasNextRow = true;
