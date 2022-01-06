@@ -21,7 +21,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference Store::constructor;
+#endif
 
 Napi::Object Store::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -46,8 +48,14 @@ Napi::Object Store::init(Napi::Env env, Napi::Object exports) {
                 &Store::getPartitionController,
                 &Store::setReadonlyAttribute)
             });
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "Store", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("Store", func);
     return exports;
 }
@@ -108,8 +116,13 @@ Napi::Value Store::putContainer(const Napi::CallbackInfo &info) {
     auto containerPtr = Napi::External<GSContainer>::New(env, pContainer);
     auto containerInfoPtr = Napi::External<GSContainerInfo >::New(env, gsInfo);
     Napi::Value containerWrapper;
+#if NAPI_VERSION > 5
+    containerWrapper = scope.Escape(Util::getInstanceData(env, "Container")->
+            New({containerPtr, containerInfoPtr})).ToObject();
+#else
     containerWrapper = scope.Escape(Container::constructor.New(
             {containerPtr, containerInfoPtr})).ToObject();
+#endif
     // Return promise object
     deferred.Resolve(containerWrapper);
     return deferred.Promise();
@@ -167,8 +180,13 @@ Napi::Value Store::getContainer(const Napi::CallbackInfo &info) {
     auto containerInfoPtr =
             Napi::External<GSContainerInfo >::New(env, &containerInfo);
     Napi::Value containerWrapper;
+#if NAPI_VERSION > 5
+    containerWrapper = scope.Escape(Util::getInstanceData(env, "Container")->
+            New({ containerPtr, containerInfoPtr })).ToObject();
+#else
     containerWrapper = scope.Escape(Container::constructor.New({ containerPtr,
             containerInfoPtr })).ToObject();
+#endif
 
     // Return promise object
     deferred.Resolve(containerWrapper);
@@ -207,8 +225,14 @@ Napi::Value Store::getContainerInfo(const Napi::CallbackInfo &info) {
     Napi::EscapableHandleScope scope(env);
     auto containerInfoPtr = Napi::External<GSContainerInfo>::New(env,
             &gsContainerInfo);
+#if NAPI_VERSION > 5
+    Napi::Value containerInfoWrapper = scope.Escape(
+            Util::getInstanceData(env, "ContainerInfo")->
+                    New({containerInfoPtr})).ToObject();
+#else
     Napi::Value containerInfoWrapper = scope.Escape(
             ContainerInfo::constructor.New({containerInfoPtr})).ToObject();
+#endif
     // Return promise object
     deferred.Resolve(containerInfoWrapper);
     return deferred.Promise();
@@ -230,8 +254,13 @@ Napi::Value Store::getPartitionController(
     Napi::EscapableHandleScope scope(env);
     auto controllerPtr = Napi::External<GSPartitionController>::New(info.Env(),
             partitionController);
+#if NAPI_VERSION > 5
+    return scope.Escape(Util::getInstanceData(env, "PartitionController")->
+        New({controllerPtr})).ToObject();
+#else
     return scope.Escape(PartitionController::constructor.New( {
         controllerPtr })).ToObject();
+#endif
 }
 
 static void freeMemoryDataMultiPut(const char **listContainerName,
@@ -411,8 +440,13 @@ Napi::Value Store::createRowKeyPredicate(const Napi::CallbackInfo &info) {
     auto predicateNode = Napi::External<
                 GSRowKeyPredicate>::New(env, predicate);
     auto typeExt = Napi::External<GSType>::New(env, &type);
+#if NAPI_VERSION > 5
+    return scope.Escape(Util::getInstanceData(env, "RowKeyPredicate")->New(
+                {predicateNode, typeExt})).ToObject();
+#else
     return scope.Escape( RowKeyPredicate::constructor.New(
                 {predicateNode, typeExt})).ToObject();
+#endif
 }
 
 // Free memory for function setMultiContainerNumList

@@ -25,8 +25,10 @@ namespace griddb {
 
 class AggregationResult : public Napi::ObjectWrap<AggregationResult> {
  public:
+#if NAPI_VERSION <= 5
     // Constructor static variable
     static Napi::FunctionReference constructor;
+#endif
     static Napi::Object init(Napi::Env env, Napi::Object exports);
 
     explicit AggregationResult(const Napi::CallbackInfo &info);

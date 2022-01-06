@@ -17,6 +17,7 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+#include <map>
 #include <string.h>
 #include <napi.h>
 #include "Field.h"
@@ -26,6 +27,9 @@
 #define UTC_TIMESTAMP_MAX 253402300799.999  // Max timestamp in seconds
 #define MAX_LONG 9007199254740992
 #define MIN_LONG -9007199254740992
+
+// Support store data for each instance library when run multi threads
+typedef std::map<std::string, Napi::FunctionReference*> AddonData;
 
 class Util {
  public:
@@ -47,5 +51,9 @@ class Util {
 
     // Other support methods
     static void freeStrData(Napi::Env env, void* data);
+    static void setInstanceData(Napi::Env env, std::string key,
+            Napi::FunctionReference *function);
+    static Napi::FunctionReference *getInstanceData(Napi::Env env, std::string key);
+    static void addonDataFinalizer(Napi::Env env, AddonData* data);
 };
 #endif  // _UTIL_H_

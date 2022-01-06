@@ -19,7 +19,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference ContainerInfo::constructor;
+#endif
 
 Napi::Object ContainerInfo::init(const Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -42,8 +44,14 @@ Napi::Object ContainerInfo::init(const Napi::Env env, Napi::Object exports) {
                     &ContainerInfo::setExpiration),
         });
 
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "ContainerInfo", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("ContainerInfo", func);
     return exports;
 }
@@ -632,9 +640,15 @@ Napi::Value ContainerInfo::getExpiration(
                 mContainerInfo.timeSeriesProperties->expirationDivisionCount;
         // Create new ExpirationInfo object
         Napi::EscapableHandleScope scope(env);
+#if NAPI_VERSION > 5
+        return scope.Escape(Util::getInstanceData(env, "ExpirationInfo")->New( {
+                Napi::Number::New(env, time), Napi::Number::New(env, unit),
+                Napi::Number::New(env, division_count) })).ToObject();
+#else
         return scope.Escape(ExpirationInfo::constructor.New( {
                 Napi::Number::New(env, time), Napi::Number::New(env, unit),
                 Napi::Number::New(env, division_count) })).ToObject();
+#endif
     } else {
         return env.Null();
     }

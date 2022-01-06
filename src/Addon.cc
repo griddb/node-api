@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-#ifndef _ADDON_H_
-#define _ADDON_H_
 #include <napi.h>
 #include "GSException.h"
 #include "StoreFactory.h"
@@ -29,14 +27,16 @@
 #include "Store.h"
 #include "RowKeyPredicate.h"
 #include "QueryAnalysisEntry.h"
+#include "Util.h"
 
 Napi::Object init(Napi::Env env, Napi::Object exports);
-
-#endif // _ADDON_H_
 
 using namespace griddb;
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
+#if NAPI_VERSION > 5
+    env.SetInstanceData<AddonData, Util::addonDataFinalizer>(new AddonData());
+#endif
     GSException::init(env, exports);
     StoreFactory::init(env, exports);
     Store::init(env, exports);
@@ -53,4 +53,3 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
 }
 
 NODE_API_MODULE(addon, init);
-

@@ -28,7 +28,9 @@
 namespace griddb {
 class GSException : public Napi::ObjectWrap<GSException>{
  public:
+#if NAPI_VERSION <= 5
     static Napi::FunctionReference constructor;
+#endif
     static Napi::Object init(Napi::Env env, Napi::Object exports);
     static Napi::Object New(Napi::Env env, GSResult code,
             void* resource = NULL);

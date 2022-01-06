@@ -18,7 +18,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference StoreFactory::constructor;
+#endif
 
 Napi::Object StoreFactory::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -27,9 +29,14 @@ Napi::Object StoreFactory::init(Napi::Env env, Napi::Object exports) {
             InstanceMethod("getStore", &StoreFactory::getStore),
             InstanceMethod("getVersion", &StoreFactory::getVersion)
         });
-
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "StoreFactory", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("StoreFactory", func);
     return exports;
 }
@@ -120,7 +127,11 @@ Napi::Value StoreFactory::getStore(const Napi::CallbackInfo& info) {
     // Create new Store object
     Napi::EscapableHandleScope scope(env);
     auto storeNode = Napi::External<GSGridStore>::New(env, store);
-    return scope.Escape( Store::constructor.New( {storeNode})).ToObject();
+#if NAPI_VERSION > 5
+    return scope.Escape(Util::getInstanceData(env, "Store")->New( {storeNode})).ToObject();
+#else
+    return scope.Escape(Store::constructor.New( {storeNode})).ToObject();
+#endif
 }
 
 Napi::Value StoreFactory::getInstance(const Napi::CallbackInfo &info) {
@@ -129,8 +140,11 @@ Napi::Value StoreFactory::getInstance(const Napi::CallbackInfo &info) {
 
     Napi::EscapableHandleScope scope(env);
     auto arg = Napi::External<GSGridStoreFactory>::New(env, factory);
-
-    return scope.Escape(constructor.New( { arg })).ToObject();
+#if NAPI_VERSION > 5
+    return scope.Escape(Util::getInstanceData(env, "StoreFactory")->New( { arg })).ToObject();
+#else
+    return scope.Escape(StoreFactory::constructor.New( { arg })).ToObject();
+#endif
 }
 
 StoreFactory::~StoreFactory() {

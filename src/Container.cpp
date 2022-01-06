@@ -19,7 +19,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference Container::constructor;
+#endif
 
 Napi::Object Container::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -41,8 +43,14 @@ Napi::Object Container::init(Napi::Env env, Napi::Object exports) {
                 InstanceAccessor("type", &Container::getType, nullptr)
             });
 
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "Container", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("Container", func);
     return exports;
 }
@@ -201,8 +209,13 @@ Napi::Value Container::query(const Napi::CallbackInfo &info) {
             mContainerInfo);
     auto gsRowPtr = Napi::External<GSRow>::New(env, mRow);
 
+#if NAPI_VERSION > 5
+    return scope.Escape(Util::getInstanceData(env, "Query")->
+            New({queryPtr, containerInfoPtr, gsRowPtr})).ToObject();
+#else
     return scope.Escape(Query::constructor.New( { queryPtr, containerInfoPtr,
             gsRowPtr })).ToObject();
+#endif
 }
 
 Napi::Value Container::get(const Napi::CallbackInfo &info) {
@@ -329,8 +342,13 @@ Napi::Value Container::queryByTimeSeriesRange(const Napi::CallbackInfo &info) {
             mContainerInfo);
     auto gsRowPtr = Napi::External<GSRow>::New(env, mRow);
 
+#if NAPI_VERSION > 5
+    return scope.Escape(Util::getInstanceData(env, "Query")->
+            New({queryPtr, containerInfoPtr, gsRowPtr})).ToObject();
+#else
     return scope.Escape(Query::constructor.New( { queryPtr, containerInfoPtr,
             gsRowPtr })).ToObject();
+#endif
 }
 
 Container::~Container() {

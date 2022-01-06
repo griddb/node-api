@@ -18,7 +18,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference Query::constructor;
+#endif
 
 Napi::Object Query::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -29,8 +31,14 @@ Napi::Object Query::init(Napi::Env env, Napi::Object exports) {
               InstanceMethod("getRowSet", &Query::getRowSet),
             });
 
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "Query", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("Query", func);
     return exports;
 }
@@ -69,8 +77,14 @@ Napi::Value Query::fetch(const Napi::CallbackInfo &info) {
     auto gsContainerInfoPtr =
             Napi::External<GSContainerInfo>::New(env, mContainerInfo);
     auto gsRowPtr = Napi::External<GSRow>::New(env, mRow);
+#if NAPI_VERSION > 5
+    Napi::Value rowsetWrapper = scope.Escape(
+            Util::getInstanceData(env, "RowSet")->New({
+                    rowsetPtr, gsContainerInfoPtr, gsRowPtr })).ToObject();
+#else
     Napi::Value rowsetWrapper = scope.Escape(RowSet::constructor.New({
             rowsetPtr, gsContainerInfoPtr, gsRowPtr })).ToObject();
+#endif
     deferred.Resolve(rowsetWrapper);
     return deferred.Promise();
 }
@@ -132,8 +146,13 @@ Napi::Value Query::getRowSet(const Napi::CallbackInfo &info) {
                 ::New(env, mContainerInfo);
     auto row_ptr = Napi::External<GSRow>::New(env, mRow);
     Napi::EscapableHandleScope scope(env);
+#if NAPI_VERSION > 5
+    return scope.Escape(Util::getInstanceData(env, "RowSet")->New({
+            rowset_ptr, containerInfo_ptr, row_ptr })).ToObject();
+#else
     return scope.Escape(RowSet::constructor.New({
             rowset_ptr, containerInfo_ptr, row_ptr })).ToObject();
+#endif
 }
 
 GSQuery* Query::gsPtr() {

@@ -16,9 +16,12 @@
 
 #include <string>
 #include "GSException.h"
+#include "Util.h"
 
 namespace griddb {
+#if NAPI_VERSION <= 5
 Napi::FunctionReference GSException::constructor;
+#endif
 Napi::Object GSException::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
     Napi::Function t = DefineClass(env, "GSException", {
@@ -29,8 +32,14 @@ Napi::Object GSException::init(Napi::Env env, Napi::Object exports) {
         InstanceMethod("getMessage", &GSException::getMessage),
         InstanceMethod("getLocation", &GSException::getLocation)
     });
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(t);
+    Util::setInstanceData(env, "GSException", constructor);
+#else
     constructor = Napi::Persistent(t);
     constructor.SuppressDestruct();
+#endif
     exports.Set("GSException", t);
     return exports;
 }
@@ -74,12 +83,21 @@ Napi::Object GSException::New(Napi::Env env, std::string message,
 }
 Napi::Object GSException::New(Napi::Env env, GSResult code,
         const char* message, const char* location, void* resource) {
+#if NAPI_VERSION > 5
+    return Util::getInstanceData(env, "GSException")->New({
+        Napi::Number::New(env, code),
+        message  ? Napi::String::New(env, message) : env.Null(),
+        location ? Napi::String::New(env, location) : env.Null(),
+        resource ? Napi::External<void>::New(env, resource) : env.Null()
+    });
+#else
     return constructor.New( {
         Napi::Number::New(env, code),
         message  ? Napi::String::New(env, message) : env.Null(),
         location ? Napi::String::New(env, location) : env.Null(),
         resource ? Napi::External<void>::New(env, resource) : env.Null()
     });
+#endif
 }
 GSException::~GSException() {
 }

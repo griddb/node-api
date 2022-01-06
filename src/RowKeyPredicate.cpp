@@ -19,7 +19,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference RowKeyPredicate::constructor;
+#endif
 
 Napi::Object RowKeyPredicate::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -35,8 +37,14 @@ Napi::Object RowKeyPredicate::init(Napi::Env env, Napi::Object exports) {
             InstanceAccessor("keyType",
                 &RowKeyPredicate::getKeyType, nullptr)
             });
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "RowKeyPredicate", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("RowKeyPredicate", func);
     return exports;
 }

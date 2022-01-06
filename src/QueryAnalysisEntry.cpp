@@ -19,7 +19,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference QueryAnalysisEntry::constructor;
+#endif
 
 Napi::Object QueryAnalysisEntry::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -28,8 +30,14 @@ Napi::Object QueryAnalysisEntry::init(Napi::Env env, Napi::Object exports) {
             { InstanceMethod("get", &QueryAnalysisEntry::get),
             });
 
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "QueryAnalysisEntry", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("QueryAnalysisEntry", func);
     return exports;
 }

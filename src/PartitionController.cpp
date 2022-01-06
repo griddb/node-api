@@ -19,7 +19,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference PartitionController::constructor;
+#endif
 
 Napi::Object PartitionController::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -36,8 +38,14 @@ Napi::Object PartitionController::init(Napi::Env env, Napi::Object exports) {
                             &PartitionController::getContainerNames)
             });
 
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "PartitionController", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("PartitionController", func);
     return exports;
 }

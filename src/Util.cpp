@@ -533,3 +533,25 @@ void Util::toField(const Napi::Env &env, Napi::Value *value, GSRow *row,
     }
 }
 
+
+void Util::setInstanceData(Napi::Env env, std::string key,
+        Napi::FunctionReference* function) {
+    env.GetInstanceData<AddonData>()->insert
+            (std::pair<std::string, Napi::FunctionReference *>(key, function));
+}
+
+Napi::FunctionReference* Util::getInstanceData(Napi::Env env, std::string key) {
+    return env.GetInstanceData<AddonData>()->find(key)->second;
+}
+
+void Util::addonDataFinalizer(Napi::Env env, AddonData* data) {
+    if (data) {
+        for (auto item : *data) {
+            // Free Napi::FunctionReference* data
+            if (item.second) {
+                delete item.second;
+            }
+        }
+        delete data;
+    }
+}
