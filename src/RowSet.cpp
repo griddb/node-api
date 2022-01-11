@@ -18,7 +18,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference RowSet::constructor;
+#endif
 
 Napi::Object RowSet::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -31,8 +33,14 @@ Napi::Object RowSet::init(Napi::Env env, Napi::Object exports) {
                 InstanceAccessor("size", &RowSet::getSize,
                         &RowSet::setReadonlyAttribute) });
 
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "RowSet", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("RowSet", func);
     return exports;
 }
@@ -114,16 +122,26 @@ Napi::Value RowSet::next(const Napi::CallbackInfo &info) {
         Napi::EscapableHandleScope scope(env);
         auto aggPtr = Napi::External<GSAggregationResult>::New(env,
                 aggResult);
+#if NAPI_VERSION > 5
+        returnWrapper = scope.Escape(
+                Util::getInstanceData(env, "AggregationResult")->New({aggPtr})).ToObject();
+#else
         returnWrapper = scope.Escape(
                 AggregationResult::constructor.New({aggPtr})).ToObject();
+#endif
         break;
     }
     case GS_ROW_SET_QUERY_ANALYSIS: {
         Napi::EscapableHandleScope scope(env);
         auto queryPtr = Napi::External<GSQueryAnalysisEntry>::New(env,
                 queryResult);
+#if NAPI_VERSION > 5
+        returnWrapper = scope.Escape(
+                Util::getInstanceData(env, "QueryAnalysisEntry")->New({queryPtr})).ToObject();
+#else
         returnWrapper = scope.Escape(
                 QueryAnalysisEntry::constructor.New({queryPtr})).ToObject();
+#endif
         break;
     }
 

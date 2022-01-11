@@ -26,11 +26,10 @@ namespace griddb {
 
 class RowKeyPredicate: public Napi::ObjectWrap<RowKeyPredicate> {
  public:
-    GSRowKeyPredicate *predicate;
-    GSType type;
-
+#if NAPI_VERSION <= 5
     // Constructor static variable
     static Napi::FunctionReference constructor;
+#endif
     static Napi::Object init(Napi::Env env, Napi::Object exports);
     explicit RowKeyPredicate(const Napi::CallbackInfo &info);
     ~RowKeyPredicate();
@@ -42,6 +41,10 @@ class RowKeyPredicate: public Napi::ObjectWrap<RowKeyPredicate> {
     Napi::Value getDistinctKeys(const Napi::CallbackInfo &info);
     Napi::Value getKeyType(const Napi::CallbackInfo &info);
     GSRowKeyPredicate* getPredicate();
+
+ private:
+    GSRowKeyPredicate *predicate;
+    GSType type;
 };
 
 }  // namespace griddb

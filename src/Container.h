@@ -30,8 +30,10 @@ namespace griddb {
 
 class Container: public Napi::ObjectWrap<Container> {
  public:
+#if NAPI_VERSION <= 5
     // Contructor static variable
     static Napi::FunctionReference constructor;
+#endif
     static Napi::Object init(Napi::Env env, Napi::Object exports);
 
     explicit Container(const Napi::CallbackInfo &info);

@@ -24,8 +24,10 @@ namespace griddb {
 
 class ExpirationInfo: public Napi::ObjectWrap<ExpirationInfo> {
  public:
+#if NAPI_VERSION <= 5
     // Constructor
     static Napi::FunctionReference constructor;
+#endif
     explicit ExpirationInfo(const Napi::CallbackInfo &info);
     static void init(Napi::Env env, Napi::Object exports);
 

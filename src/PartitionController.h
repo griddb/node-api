@@ -25,8 +25,10 @@ namespace griddb {
 
 class PartitionController: public Napi::ObjectWrap<PartitionController> {
  public:
+#if NAPI_VERSION <= 5
     // Constructor
     static Napi::FunctionReference constructor;
+#endif
     static Napi::Object init(Napi::Env env, Napi::Object exports);
     explicit PartitionController(const Napi::CallbackInfo &info);
 

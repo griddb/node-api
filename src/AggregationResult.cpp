@@ -19,7 +19,9 @@
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference AggregationResult::constructor;
+#endif
 
 Napi::Object AggregationResult::init(Napi::Env env, Napi::Object exports) {
     Napi::HandleScope scope(env);
@@ -27,8 +29,14 @@ Napi::Object AggregationResult::init(Napi::Env env, Napi::Object exports) {
     Napi::Function func = DefineClass(env, "AggregationResult", {
             InstanceMethod("get", &AggregationResult::get) });
 
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "AggregationResult", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("AggregationResult", func);
     return exports;
 }

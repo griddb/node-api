@@ -30,8 +30,9 @@ namespace griddb {
 
 class Store: public Napi::ObjectWrap<Store> {
  public:
-    // Constructor static variable
+#if NAPI_VERSION <= 5
     static Napi::FunctionReference constructor;
+#endif
     static Napi::Object init(Napi::Env env, Napi::Object exports);
 
     explicit Store(const Napi::CallbackInfo &info);

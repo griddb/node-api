@@ -28,8 +28,10 @@ namespace griddb {
 
 class QueryAnalysisEntry: public Napi::ObjectWrap<QueryAnalysisEntry> {
  public:
+#if NAPI_VERSION <= 5
     // Constructor static variable
     static Napi::FunctionReference constructor;
+#endif
     static Napi::Object init(Napi::Env env, Napi::Object exports);
 
     explicit QueryAnalysisEntry(const Napi::CallbackInfo &info);

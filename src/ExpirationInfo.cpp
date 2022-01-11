@@ -17,10 +17,13 @@
 #include "ExpirationInfo.h"
 #include "GSException.h"
 #include "Macro.h"
+#include "Util.h"
 
 namespace griddb {
 
+#if NAPI_VERSION <= 5
 Napi::FunctionReference ExpirationInfo::constructor;
+#endif
 
 void ExpirationInfo::init(Napi::Env env, Napi::Object exports) {
     Napi::Function func = DefineClass(env, "ExpirationInfo",
@@ -30,8 +33,14 @@ void ExpirationInfo::init(Napi::Env env, Napi::Object exports) {
                     ExpirationInfo::InstanceAccessor("divisionCount",
                             &ExpirationInfo::getDivisionCount,
                             &ExpirationInfo::setDivisionCount), });
+#if NAPI_VERSION > 5
+    Napi::FunctionReference* constructor = new Napi::FunctionReference();
+    *constructor = Napi::Persistent(func);
+    Util::setInstanceData(env, "ExpirationInfo", constructor);
+#else
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
+#endif
     exports.Set("ExpirationInfo", func);
 }
 
