@@ -319,14 +319,21 @@ Napi::Value Container::queryByTimeSeriesRange(const Napi::CallbackInfo &info) {
         THROW_EXCEPTION_WITH_STR(env, "Wrong arguments", mContainer)
         return env.Null();
     }
-    Field field;
+
     Napi::Value startValue = info[0].As<Napi::Value>();
     Napi::Value endValue = info[1].As<Napi::Value>();
 
     GSResult ret;
     GSQuery* pQuery = NULL;
-    GSTimestamp startTimestampValue = Util::toGsTimestamp(env, &startValue);
-    GSTimestamp endTimestampValue = Util::toGsTimestamp(env, &endValue);
+    GSTimestamp startTimestampValue;
+    GSTimestamp endTimestampValue;
+    try {
+        startTimestampValue = Util::toGsTimestamp(env, &startValue);
+        endTimestampValue = Util::toGsTimestamp(env, &endValue);
+    } catch (const Napi::Error &e) {
+        e.ThrowAsJavaScriptException();
+        return env.Null();
+    }
 
     ret = gsQueryByTimeSeriesRange(mContainer, startTimestampValue,
         endTimestampValue, &pQuery);
@@ -625,8 +632,13 @@ Napi::Value Container::remove(const Napi::CallbackInfo &info) {
             break;
         }
         case GS_TYPE_TIMESTAMP: {
-            GSTimestamp tmpTimestampValue =
-                    Util::toGsTimestamp(env, &fieldValue);
+            GSTimestamp tmpTimestampValue;
+            try{
+                tmpTimestampValue = Util::toGsTimestamp(env, &fieldValue);
+            } catch (const Napi::Error &e) {
+                PROMISE_REJECT_WITH_ERROR(deferred, e)
+                break;
+            }
             ret = gsDeleteRow(mContainer, &tmpTimestampValue, &exists);
             break;
         }

@@ -149,8 +149,15 @@ void RowKeyPredicate::setRange(const Napi::CallbackInfo &info) {
     case GS_TYPE_TIMESTAMP: {
         Napi::Value startKey = info[0].As<Napi::Value>();
         Napi::Value finishKey = info[1].As<Napi::Value>();
-        GSTimestamp tmpTimestampStart = Util::toGsTimestamp(env, &startKey);
-        GSTimestamp tmpTimestampFinish = Util::toGsTimestamp(env, &finishKey);
+        GSTimestamp tmpTimestampStart;
+        GSTimestamp tmpTimestampFinish;
+        try {
+            tmpTimestampStart = Util::toGsTimestamp(env, &startKey);
+            tmpTimestampFinish = Util::toGsTimestamp(env, &finishKey);
+        } catch (const Napi::Error &e) {
+            e.ThrowAsJavaScriptException();
+            return;
+        }
         ret = gsSetPredicateStartKeyByTimestamp(predicate,
                 &tmpTimestampStart);
         if (!GS_SUCCEEDED(ret)) {
@@ -305,7 +312,13 @@ void RowKeyPredicate::setDistinctKeys(const Napi::CallbackInfo &info) {
         }
         case GS_TYPE_TIMESTAMP: {
             Napi::Value value = arrayForSet[i];
-            GSTimestamp key = Util::toGsTimestamp(env, &value);
+            GSTimestamp key;
+            try {
+                key = Util::toGsTimestamp(env, &value);
+            } catch (const Napi::Error &e) {
+                e.ThrowAsJavaScriptException();
+                break;
+            }
             ret = gsAddPredicateKeyByTimestamp(predicate, key);
             if (!GS_SUCCEEDED(ret)) {
                 THROW_EXCEPTION_WITH_CODE(env, ret, predicate)

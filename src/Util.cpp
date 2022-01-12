@@ -277,7 +277,7 @@ Napi::Value Util::fromField(const Napi::Env& env, GSRow* row, int column,
             return fromFieldAsGeometry(env, row, column);
             break;
         default:
-            THROW_EXCEPTION_WITH_STR(env, "Type is not support.", NULL)
+            THROW_CPP_EXCEPTION_WITH_STR(env, "Type is not support.")
         }
     return env.Null();
 }
@@ -314,8 +314,8 @@ static void toFieldAsLong(const Napi::Env &env, Napi::Value *value, GSRow *row,
     // When input value is integer,
     // it should be between -9007199254740992(-2^53)/9007199254740992(2^53).
     if (!(MIN_LONG <= longVal && MAX_LONG >= longVal)) {
-        THROW_EXCEPTION_WITH_STR(env,
-            "Input error, should be in range of long", NULL)
+        THROW_CPP_EXCEPTION_WITH_STR(env,
+            "Input error, should be in range of long")
         return;
     }
 
@@ -397,9 +397,7 @@ static void toFieldAsFloat(const Napi::Env &env, Napi::Value *value,
 static void toFieldAsDouble(const Napi::Env &env, Napi::Value *value,
         GSRow *row, int column) {
     if (!value->IsNumber()) {
-        Napi::Object gsException = griddb::GSException::New(env,
-                "Input error, should be double");
-        THROW_GSEXCEPTION(gsException)
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be double")
         return;
     }
     double doubleVal = value->As<Napi::Number>().DoubleValue();
@@ -423,25 +421,16 @@ GSTimestamp Util::toGsTimestamp(const Napi::Env &env, Napi::Value *value) {
         GSBool ret = gsParseTime(
                 (const GSChar *)datetimestring.c_str(), &timestampVal);
         if (ret != GS_TRUE) {
-            Napi::Object gsException = griddb::GSException::New(
-                    env, "Invalid datetime string");
-            THROW_GSEXCEPTION(gsException)
-            return 0;
+            THROW_CPP_EXCEPTION_WITH_STR(env, "Invalid date time string")
         }
     } else if (value->IsNumber()) {
         timestampVal = value->As<Napi::Number>().Int64Value();
         if (timestampVal > (UTC_TIMESTAMP_MAX * 1000)) {  // miliseconds
-            Napi::Object gsException = griddb::GSException::New(
-                    env, "Invalid timestamp");
-            THROW_GSEXCEPTION(gsException)
-            return 0;
+            THROW_CPP_EXCEPTION_WITH_STR(env, "Invalid timestamp")
         }
     } else {
         // Invalid input
-        Napi::Object gsException = griddb::GSException::New(
-                env, "Invalid input");
-        THROW_GSEXCEPTION(gsException)
-        return 0;
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Invalid input")
     }
     return timestampVal;
 }
@@ -457,10 +446,7 @@ static void toFieldAsBlob(const Napi::Env &env, Napi::Value *value, GSRow *row,
         int column) {
     GSBlob blobVal;
     if (!value->IsBuffer()) {
-        Napi::Object gsException = griddb::GSException::New(env,
-                "Input error, should be buffer");
-        THROW_GSEXCEPTION(gsException)
-        return;
+        THROW_CPP_EXCEPTION_WITH_STR(env, "Input error, should be buffer")
     }
     Napi::Buffer<char> stringBuffer = value->As<Napi::Buffer<char>>();
     char *v = static_cast<char*>(stringBuffer.Data());
@@ -532,7 +518,6 @@ void Util::toField(const Napi::Env &env, Napi::Value *value, GSRow *row,
         break;
     }
 }
-
 
 void Util::setInstanceData(Napi::Env env, std::string key,
         Napi::FunctionReference* function) {
