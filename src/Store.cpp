@@ -323,7 +323,7 @@ Napi::Value Store::multiPut(const Napi::CallbackInfo &info) {
         listRowContainerCount = new int[containerCount]();
         entryList = new GSContainerRowEntry[containerCount]();
         allRowList = new GSRow**[containerCount]();
-    } catch(std::bad_alloc& ba) {
+    } catch(std::bad_alloc&) {
         freeMemoryDataMultiPut(listContainerName, listRowContainerCount,
                     entryList, allRowList, containerCount);
         PROMISE_REJECT_WITH_STRING(deferred, env, "Memory allocation error",
@@ -347,7 +347,7 @@ Napi::Value Store::multiPut(const Napi::CallbackInfo &info) {
         const int rowCount = arrOfContainer.Length();
         try {
             allRowList[i] = new GSRow*[rowCount]();
-        } catch (std::bad_alloc& ba) {
+        } catch (std::bad_alloc&) {
             freeMemoryDataMultiPut(listContainerName, listRowContainerCount,
                         entryList, allRowList, containerCount);
             PROMISE_REJECT_WITH_STRING(deferred, env,
@@ -484,7 +484,7 @@ static bool setMultiContainerNumList(Napi::Env env, GSGridStore *mStore,
     try {
         *colNumList = new int[length]();
         *typeList = new GSType*[length]();
-    } catch (std::bad_alloc& ba) {
+    } catch (std::bad_alloc&) {
         freeMemoryDataSetMulti(predicateList, colNumList, typeList, length);
         return false;
     }
@@ -500,7 +500,7 @@ static bool setMultiContainerNumList(Napi::Env env, GSGridStore *mStore,
         (*colNumList)[i] = containerInfo.columnCount;
         try {
             (*typeList)[i] = new GSType[(*colNumList)[i]]();
-        } catch (std::bad_alloc& ba) {
+        } catch (std::bad_alloc&) {
             freeMemoryDataSetMulti(predicateList, colNumList, typeList,
                     length);
             return false;
@@ -561,7 +561,7 @@ Napi::Value Store::multiGet(const Napi::CallbackInfo &info) {
     std::map<std::string, std::vector<int> > dict;
     try {
         predEntryValueList = new GSRowKeyPredicateEntry[containerCount]();
-    } catch (std::bad_alloc& ba) {
+    } catch (std::bad_alloc&) {
         PROMISE_REJECT_WITH_STRING(deferred, env, "Memory allocation error",
                 mStore)
     }
@@ -655,7 +655,7 @@ Napi::Value Store::fetchAll(const Napi::CallbackInfo &info) {
     }
     try {
         queryList = new GSQuery*[queryCount];
-    } catch (std::bad_alloc& ba) {
+    } catch (std::bad_alloc&) {
         PROMISE_REJECT_WITH_STRING(deferred, env, "Memory allocation error",
                 mStore)
     }
