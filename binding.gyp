@@ -1,7 +1,7 @@
 {
   'variables': {
     # Need only for build on Windows
-    'C_CLIENT_PATH': 'C:/Program Files/GridDB/C Client/4.5.0'
+    'C_CLIENT_PATH': 'C:/Program Files/GridDB/C Client/5.0.0'
   },
   'targets': [
     {
