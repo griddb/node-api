@@ -11,7 +11,7 @@ Building of the library and execution of the sample programs have been checked i
     OS: CentOS 7.9(x64)/Ubuntu 20.04(x64)/Windows 10/MacOS 10.15
     Node.js: v16
     GridDB C client: V5.0.0 CE
-    GridDB server: V5.0.0 CE, CentOS 7.6(x64)
+    GridDB server: V5.0.0 CE, CentOS 7.9(x64)
 
 Note: We can use Node.js v18 for Ubuntu 20.04(x64)/Windows 10/MacOS 10.15(/CentOS 8).
 
