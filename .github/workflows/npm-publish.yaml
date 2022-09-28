@@ -1,0 +1,53 @@
+name: GridDB node-api create package on release to npm
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish-npm:
+
+    runs-on: ubuntu-latest
+
+    env:
+      CENTOS_VERSION: 7
+      GRIDDB_DOCKER_SERVER: griddb/griddb
+      GRIDDB_NOTIFICATION_ADDRESS: "239.0.0.1"
+      GRIDDB_NOTIFICATION_PORT: "31999"
+      GRIDDB_CLUSTER_NAME: "dockerGridDB"
+      GRIDDB_USERNAME: "admin"
+      GRIDDB_PASSWORD: "admin"
+      DOCKER_CONTAINER_NAME_CENTOS: "griddbCentosDocker"
+    steps:
+    - uses: actions/checkout@v3
+    - name: Start GridDB server
+      run: |
+        docker pull ${GRIDDB_DOCKER_SERVER}
+        docker run -d --network="host" ${GRIDDB_DOCKER_SERVER}
+
+    - name: Pull and run docker image centos7
+      run: . .github/workflows/prepublish-npm.sh && pull_run_docker
+
+    - name: Install dependencies "C API , Node"
+      run: . .github/workflows/prepublish-npm.sh && install_dependency
+
+    - name: Build GridDB node-api
+      run: . .github/workflows/prepublish-npm.sh && build_node_api
+
+    - name: Run sample on CentOS 7
+      run: . .github/workflows/prepublish-npm.sh && run_sample_centos7
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        registry-url: https://registry.npmjs.org/
+    - name: Run sample on Ubuntu 20.04
+      run: . .github/workflows/prepublish-npm.sh && run_sample_ubuntu
+
+    - name: Rename file from README-NPM to README
+      run: mv README-NPM.md README.md # README file for npm publish
+
+    - name: Publish package to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
