@@ -8,18 +8,16 @@ GridDB Node API is developed using GridDB C Client and [node-addon-api](https://
 
 Building of the library and execution of the sample programs have been checked in the following environment.
 
-    OS: CentOS 7.9(x64)/Ubuntu 20.04(x64)/Windows 10/MacOS 10.15
-    Node.js: v16
-    GridDB C client: V5.0.0 CE
-    GridDB server: V5.0.0 CE, CentOS 7.9(x64)
-
-Note: We can use Node.js v18 for Ubuntu 20.04(x64)/Windows 10/MacOS 10.15(/CentOS 8).
+    OS: Ubuntu 22.04(x64)/RockyLinux 9.4(x64)/Windows 11(x64)/MacOS 12
+    Node.js: v24
+    GridDB C client: V5.9 CE
+    GridDB server: V5.9 CE, Ubuntu 22.04(x64)
 
 ## Preparations
 
 Install [GridDB Server](https://github.com/griddb/griddb) and [C Client](https://github.com/griddb/c_client). 
 
-## QuickStart (CentOS 7/Ubuntu 20.04(x64)/MacOS 10.15)
+## QuickStart (Ubuntu 22.04/RockyLinux 9.4/MacOS 12)
 
 ### Build
     1. Set LIBRARY_PATH.
@@ -50,10 +48,10 @@ GridDB Server need to be started in advance.
             <GridDB cluster name> <GridDB user> <GridDB password>
           -->[ 'name01', false, 1, <Buffer 41 42 43 44 45 46 47 48 49 4a> ]
 
-## QuickStart (Windows 10)
+## QuickStart (Windows 11)
 
 ### Build and run in cmd
-    1. Correct the path to C Client "C_CLIENT_PATH" in binding.gyp. Default is 'C:/Program Files/GridDB/C Client/5.0.0'
+    1. Correct the path to C Client "C_CLIENT_PATH" in binding.gyp. Default is 'C:/Program Files/GridDB/C Client/X.X.X'
 
     2. The command to run build project
 
@@ -64,6 +62,8 @@ GridDB Server need to be started in advance.
         $ set NODE_PATH=<installed directory path>
 
     3. Write require("griddb-node-api") in Node.js.
+
+    Note: X.X.X is the GridDB version.
 
 ### How to run sample
 
